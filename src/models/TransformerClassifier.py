@@ -19,6 +19,7 @@ class TransformerClassifier(nn.Module):
         for param in self.bert.parameters():
             param.requires_grad = False
 
-    def forward(self, x: Tensor) -> Tensor:
-        last_hidden_states = self.bert(x)[0]
-        return self.classifier(last_hidden_states)
+    def forward(self, input_ids: Tensor, attention_mask: Tensor) -> Tensor:
+        last_hidden_states = self.bert(input_ids=input_ids, attention_mask=attention_mask)[0]
+        cls_output = last_hidden_states[:, 0, :]
+        return self.classifier(cls_output)
