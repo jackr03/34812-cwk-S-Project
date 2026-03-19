@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --partition=gpuA
+#SBATCH --partition=gpuL
 #SBATCH --gpus=1
 #SBATCH -c 8
 #SBATCH --ntasks=1
@@ -16,9 +16,11 @@ BASE="/mnt/iusers01/fse-ugpgt01/compsci01/j84846ky/scratch/34812-cwk-S-Project"
 source "$BASE/.venv/bin/activate"
 export PYTHONPATH="$BASE:$PYTHONPATH"
 
-LOG_FILE="$BASE/logs/train_$(date +%Y-%m-%d_%H-%M-%S).log"
-exec > >(tee -a "$LOG_FILE") 2>&1
+RUN_DIR="$BASE/runs/train_$(date +%Y-%m-%d_%H-%M)"
+mkdir -p "$RUN_DIR/plots"
+
+exec > >(tee -a "$RUN_DIR/output.log") 2>&1
 
 echo "===== Training started at $(date) ====="
-CUDA_VISIBLE_DEVICES=0 python -u -m src.run_train
+CUDA_VISIBLE_DEVICES=0 python -u -m src.run_train --run-dir "$RUN_DIR"
 echo "===== Training finished at $(date) ====="

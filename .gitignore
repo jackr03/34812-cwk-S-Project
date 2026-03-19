@@ -208,6 +208,10 @@ __marimo__/
 
 # Project
 checkpoints/
+runs/*/
+logs/*/
 
 # Other
 .idea
+models/*
+!models/.gitkeep

@@ -9,7 +9,7 @@ from src.config import CONFIG
 class TransformerClassifier(nn.Module):
     def __init__(self, num_labels: int, dropout: float):
         super().__init__()
-        self.bert = AutoModel.from_pretrained(CONFIG.transformer_model)
+        self.bert = AutoModel.from_pretrained(CONFIG.transformer.model)
         self.classifier = nn.Sequential(
             nn.Dropout(p=dropout),
             nn.Linear(in_features=self.bert.config.hidden_size, out_features=num_labels)
@@ -19,7 +19,7 @@ class TransformerClassifier(nn.Module):
         for param in self.bert.parameters():
             param.requires_grad = False
 
-    def forward(self, input_ids: Tensor, attention_mask: Tensor) -> Tensor:
-        last_hidden_states = self.bert(input_ids=input_ids, attention_mask=attention_mask)[0]
-        cls_output = last_hidden_states[:, 0, :]
+    def forward(self, input_ids: Tensor, attention_masks: Tensor) -> Tensor:
+        last_hidden_states = self.bert(input_ids=input_ids, attention_mask=attention_masks)
+        cls_output = last_hidden_states.last_hidden_state[:, 0, :]
         return self.classifier(cls_output)
