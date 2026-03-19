@@ -12,11 +12,7 @@ def main():
     #TODO: What is this config seed
     set_seed(CONFIG.seed)
 
-    device = torch.device(
-    'cuda' if torch.cuda.is_available() else
-    'mps' if torch.backends.mps.is_available() else
-    'cpu'
-    )
+    device = get_device()
     print(f"Using device: {device}")
 
     tokenizer = AutoTokenizer.from_pretrained(CONFIG.transformer_model)
