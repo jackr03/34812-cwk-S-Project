@@ -1,3 +1,4 @@
+print('Starting training script...')
 import argparse
 import json
 import time
@@ -16,6 +17,8 @@ from src.config import CONFIG
 from src.models.nli_dataset import NLIDataset
 from src.models.transformer_classifier import TransformerClassifier
 from src.utils import run_sweep, plot_training_history
+
+print(f"Imports complete")
 
 TRAIN_DATA_PATH = Path('data/train.csv')
 VAL_DATA_PATH = Path('data/dev.csv')
@@ -149,10 +152,11 @@ def main():
 
     def objective(trial) -> float:
         lr = trial.suggest_float('lr', 1e-4, 1e-2, log=True)
+        bert_lr = trial.suggest_float('bert_lr', 1e-5, 5e-5, log=True)
         dropout = trial.suggest_float('dropout', 0.1, 0.5)
 
         model = TransformerClassifier(num_labels=2, dropout=dropout).to(device)
-        optimiser = torch.optim.Adam(model.parameters(), lr=lr)
+        optimiser = torch.optim.Adam(model.get_param_groups(classifier_lr=lr, bert_lr=bert_lr))
         criterion = nn.CrossEntropyLoss()
 
         val_acc = 0.0
@@ -175,7 +179,8 @@ def main():
     print()
 
     model = TransformerClassifier(num_labels=2, dropout=hyperparameters['dropout']).to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=hyperparameters['lr'])
+    bert_lr = hyperparameters.get('bert_lr', 2e-5)
+    optimizer = torch.optim.Adam(model.get_param_groups(classifier_lr=hyperparameters['lr'], bert_lr=bert_lr))
     criterion = nn.CrossEntropyLoss()
 
     total_params = sum(p.numel() for p in model.parameters())
@@ -198,6 +203,7 @@ def main():
         'epochs': CONFIG.epochs,
         'batch_size': CONFIG.batch_size,
         'learning_rate': hyperparameters['lr'],
+        'bert_learning_rate': bert_lr,
         'dropout': hyperparameters['dropout'],
         'optimizer': 'Adam',
         'loss_function': 'CrossEntropyLoss',
