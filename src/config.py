@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -16,9 +17,11 @@ class TransformerConfig:
 
 @dataclass(frozen=True)
 class Config:
+    project_root = Path(__file__).resolve().parent.parent
     seed: int = 100
     batch_size: int = 256
     epochs: int = 20
+
     hyperparameter_tuning: HyperparameterTuningConfig = HyperparameterTuningConfig()
     transformer: TransformerConfig = TransformerConfig()
 

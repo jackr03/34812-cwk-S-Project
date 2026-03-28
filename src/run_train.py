@@ -123,6 +123,28 @@ def evaluate_test(device, model, tokeniser, test_path: Path) -> dict:
     }
 
 
+def write_output_benchmark(device, model, tokeniser, test_path: Path, is_transformer: bool):
+    test_pd = pd.read_csv(test_path)
+    test_dataset = NLIDataset(test_pd, tokeniser, CONFIG.transformer.max_length)
+    test_dataloader = DataLoader(test_dataset, batch_size=CONFIG.batch_size, shuffle=False, num_workers=4, pin_memory=True)
+
+    all_preds = []
+    model.eval()
+    with torch.inference_mode():
+        for batch in tqdm(test_dataloader, desc='Evaluating', unit='batches'):
+            input_ids = batch['input_ids'].to(device)
+            attention_mask = batch['attention_mask'].to(device)
+
+            logits = model(input_ids, attention_mask)
+            preds = logits.argmax(dim=1)
+            all_preds.extend(preds.cpu().tolist())
+
+    result_pd = pd.DataFrame({'prediction': all_preds})
+
+    file_name = 'Group_40_C' if is_transformer else 'Group_40_B'
+    result_pd.to_csv(CONFIG.project_root / 'output' / file_name, index=False)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--run-dir', type=Path, required=True, help='Directory for this run\'s outputs')
