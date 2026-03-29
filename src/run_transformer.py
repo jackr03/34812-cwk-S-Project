@@ -182,7 +182,7 @@ def main():
         criterion = nn.CrossEntropyLoss()
 
         val_acc = 0.0
-        for epoch in range(CONFIG.hyperparameter_tuning.epochs):
+        for epoch in range(CONFIG.transformer.hyperparameter_tuning.epochs):
             train_one_epoch(device, model, criterion, optimiser, train_dataloader)
             val_loss, val_acc = validate(device, model, criterion, val_dataloader)
 
@@ -192,9 +192,9 @@ def main():
 
         return val_acc
 
-    if CONFIG.hyperparameter_tuning.should_run:
+    if CONFIG.transformer.hyperparameter_tuning.should_run:
         print(f'Running hyperparameter sweep...')
-        run_sweep(objective, HYPERPARAMETERS_PATH)
+        run_sweep(objective, HYPERPARAMETERS_PATH, CONFIG.transformer.hyperparameter_tuning.trials)
 
     hyperparameters = json.load(open(HYPERPARAMETERS_PATH, 'r'))
     print(f'Hyperparameters used: {hyperparameters}')

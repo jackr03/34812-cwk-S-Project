@@ -14,7 +14,7 @@ module load libs/cuda/12.4.1
 
 BASE="/mnt/iusers01/fse-ugpgt01/compsci01/j84846ky/scratch/34812-cwk-S-Project"
 
-RUN_DIR="$BASE/runs/train_$(date +%Y-%m-%d_%H-%M)"
+RUN_DIR="$BASE/runs/transformer/$(date +%Y-%m-%d_%H-%M)"
 mkdir -p "$RUN_DIR/plots"
 
 exec > >(tee -a "$RUN_DIR/output.log") 2>&1
@@ -33,5 +33,5 @@ echo "Install complete at $(date)"
 export PYTHONPATH="$BASE:$PYTHONPATH"
 
 echo "===== Training started at $(date) ====="
-CUDA_VISIBLE_DEVICES=0 python -u -m src.run_train --run-dir "$RUN_DIR"
+CUDA_VISIBLE_DEVICES=0 python -u -m src.run_transformer --run-dir "$RUN_DIR"
 echo "===== Training finished at $(date) ====="

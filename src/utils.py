@@ -4,13 +4,11 @@ from pathlib import Path
 import optuna
 from matplotlib import pyplot as plt
 
-from src.config import CONFIG
 
-
-def run_sweep(objective, output_path: Path) -> None:
+def run_sweep(objective, output_path: Path, n_trials: int) -> None:
     print('Running hyperparameter sweep...')
     study = optuna.create_study(direction='maximize', pruner=optuna.pruners.MedianPruner())
-    study.optimize(objective, n_trials=CONFIG.hyperparameter_tuning.trials)
+    study.optimize(objective, n_trials=n_trials)
 
     print('Hyperparameter sweep completed.')
     print(f'Accuracy: {study.best_value * 100:.2f}%')
