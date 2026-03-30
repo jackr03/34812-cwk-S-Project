@@ -147,6 +147,8 @@ def main():
 
         if val_acc > best_acc:
             best_acc = val_acc
+            # Avoid saving GloVe embedding
+            state = {k: v for k, v in model.state_dict().items() if 'embedding' not in k}
             torch.save(model.state_dict(), MODEL_PATH)
             patience = 0
         else:

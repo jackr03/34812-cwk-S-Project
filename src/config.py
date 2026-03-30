@@ -13,7 +13,7 @@ class TransformerHyperparameterTuningConfig:
 class LSTMHyperparameterTuningConfig:
     epochs: int = 5
     trials: int = 20
-    should_run: bool = True
+    should_run: bool = False
 
 
 @dataclass(frozen=True)
