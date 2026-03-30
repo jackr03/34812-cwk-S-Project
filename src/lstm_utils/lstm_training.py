@@ -1,5 +1,5 @@
 import torch
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, precision_score, recall_score
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
@@ -80,7 +80,7 @@ def evaluate(device, model, test_dataloader: DataLoader) -> dict:
     all_labels = []
 
     if CONFIG.lstm.show_progress:
-        test_dataloader = tqdm(test_dataloader, desc='Evaluating NLI_trial', unit='batches')
+        test_dataloader = tqdm(test_dataloader, desc='Evaluating', unit='batches')
 
     with torch.inference_mode():
         for batch in test_dataloader:
@@ -96,10 +96,12 @@ def evaluate(device, model, test_dataloader: DataLoader) -> dict:
             all_preds.extend(preds.cpu().tolist())
             all_labels.extend(labels.cpu().tolist())
 
-    accuracy = sum(p == l for p, l in zip(all_preds, all_labels)) / len(all_labels) * 100
-    f1 = f1_score(all_labels, all_preds, average='weighted')
-
     return {
-        'accuracy': accuracy,
-        'f1_weighted': f1,
+        'accuracy': sum(p == l for p, l in zip(all_preds, all_labels)) / len(all_labels) * 100,
+        'macro_precision': precision_score(all_labels, all_preds, average='macro'),
+        'macro_recall': recall_score(all_labels, all_preds, average='macro'),
+        'macro_f1': f1_score(all_labels, all_preds, average='macro'),
+        'weighted_precision': precision_score(all_labels, all_preds, average='weighted'),
+        'weighted_recall': recall_score(all_labels, all_preds, average='weighted'),
+        'weighted_f1': f1_score(all_labels, all_preds, average='weighted')
     }

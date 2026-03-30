@@ -155,7 +155,8 @@ def main():
 
         epoch_time = time.time() - epoch_start
         elapsed = time.time() - total_start
-        print(f'Train Loss: {train_loss:.2f} | Train Accuracy: {train_acc:.2f}% | Val Loss: {val_loss:.2f} | Val Accuracy: {val_acc:.2f}%')
+        print(f'[Train] Loss: {train_loss:.2f} | Accuracy: {train_acc:.2f}%')
+        print(f'[Val] Loss: {val_loss:.2f} | Accuracy: {val_acc:.2f}%')
         print(f'Epoch time: {epoch_time:.1f}s | Total elapsed: {elapsed:.1f}s')
         print()
 
@@ -167,10 +168,17 @@ def main():
     print(f'Training complete in {total_time:.1f}s')
     print(f'Best model had an accuracy of {best_acc:.2f}%.')
 
-    print('Running final evaluation on NLI_trial.csv...')
+    print('Running final evaluation on benchmark...')
     model.load_state_dict(torch.load(MODEL_PATH))
     test_results = evaluate(device, model, test_dataloader)
-    print(f'NLI_trial — Accuracy: {test_results["accuracy"]:.2f}% | F1 (weighted): {test_results["f1_weighted"]:.4f}')
+    print('[Benchmark Results]')
+    print(f'Accuracy:           {test_results["accuracy"]:.2f}%')
+    print(f'Macro Precision:    {test_results["macro_precision"]:.4f}')
+    print(f'Macro Recall:       {test_results["macro_recall"]:.4f}')
+    print(f'Macro F1:           {test_results["macro_f1"]:.4f}')
+    print(f'Weighted Precision: {test_results["weighted_precision"]:.4f}')
+    print(f'Weighted Recall:    {test_results["weighted_recall"]:.4f}')
+    print(f'Weighted F1:        {test_results["weighted_f1"]:.4f}')
 
     results = {
         'training_time_seconds': round(total_time, 1),
@@ -179,7 +187,7 @@ def main():
         'final_train_accuracy': train_accs[-1],
         'final_val_loss': val_losses[-1],
         'final_val_accuracy': val_accs[-1],
-        'nli_trial': test_results,
+        'benchmark_results': test_results,
         'epoch_history': {
             'train_losses': train_losses,
             'train_accs': train_accs,
