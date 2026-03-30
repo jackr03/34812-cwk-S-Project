@@ -1,4 +1,5 @@
 import torch
+from sklearn.metrics import f1_score
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
@@ -60,3 +61,31 @@ def validate(device, model, criterion, val_dataloader: DataLoader) -> tuple[floa
     accuracy = correct / total
 
     return avg_loss, accuracy
+
+
+def evaluate(device, model, test_dataloader: DataLoader) -> dict:
+    model.eval()
+
+    all_preds = []
+    all_labels = []
+    with torch.inference_mode():
+        for batch in tqdm(test_dataloader, desc='Evaluating NLI_trial', unit='batches'):
+            premise_ids = batch['premise_ids'].to(device)
+            premise_mask = batch['premise_mask'].to(device)
+            hypothesis_ids = batch['hypothesis_ids'].to(device)
+            hypothesis_mask = batch['hypothesis_mask'].to(device)
+            labels = batch['label'].to(device)
+
+            logits = model(premise_ids, premise_mask, hypothesis_ids, hypothesis_mask)
+            preds = logits.argmax(dim=1)
+
+            all_preds.extend(preds.cpu().tolist())
+            all_labels.extend(labels.cpu().tolist())
+
+    accuracy = sum(p == l for p, l in zip(all_preds, all_labels)) / len(all_labels)
+    f1 = f1_score(all_labels, all_preds, average='weighted')
+
+    return {
+        'accuracy': accuracy,
+        'f1_weighted': f1,
+    }
