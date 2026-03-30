@@ -15,7 +15,7 @@ class LSTMClassifier(nn.Module):
         unk = torch.zeros(1, vectors.shape[1])
         matrix = torch.cat([pad, unk, vectors], dim=0)
 
-        self.embedding = nn.Embedding.from_pretrained(matrix, freeze=False, padding_idx=0)
+        self.embedding = nn.Embedding.from_pretrained(matrix, freeze=True, padding_idx=0)
         self.dropout = nn.Dropout(CONFIG.lstm.dropout)
 
         self.encode_lstm = nn.LSTM(

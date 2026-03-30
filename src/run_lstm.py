@@ -153,16 +153,16 @@ def main():
         else:
             patience += 1
 
-        if patience == CONFIG.patience:
-            print(f'Finishing training early, no improvement in {CONFIG.patience} epochs')
-            break
-
         epoch_time = time.time() - epoch_start
         elapsed = time.time() - total_start
         print(f'Train Loss: {train_loss:.2f} | Train Accuracy: {train_acc:.2f}% | Val Loss: {val_loss:.2f} | Val Accuracy: {val_acc:.2f}%')
         print(f'Epoch time: {epoch_time:.1f}s | Total elapsed: {elapsed:.1f}s')
         print()
 
+        if patience == CONFIG.patience:
+            print(f'Finishing training early, no improvement in {CONFIG.patience} epochs')
+            break
+        
     total_time = time.time() - total_start
     print(f'Training complete in {total_time:.1f}s')
     print(f'Best model had an accuracy of {best_acc:.2f}%.')

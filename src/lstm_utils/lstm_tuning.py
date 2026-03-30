@@ -36,8 +36,7 @@ def run_hyperparameter_sweep(device, lstm_tokeniser: LSTMTokeniser, train_datalo
     study.optimize(objective, n_trials=CONFIG.lstm.hyperparameter_tuning.trials)
 
     print('Hyperparameter sweep completed.')
-    print(f'Accuracy: {study.best_value * 100:.2f}%')
-    print(f'Hyperparameters: {study.best_params}')
+    print(f'Best Accuracy: {study.best_value:.2f}%')
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, 'w') as f:

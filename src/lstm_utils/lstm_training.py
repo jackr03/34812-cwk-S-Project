@@ -29,7 +29,6 @@ def train_one_epoch(device, model, criterion, optimiser, train_dataloader: DataL
         loss = criterion(logits, labels)
 
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=5.0)  
         optimiser.step()
 
         total_loss += loss.item()
