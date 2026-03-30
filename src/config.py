@@ -40,7 +40,7 @@ class Config:
     seed: int = 100
     batch_size: int = 256
     epochs: int = 100
-    patience: int = 20
+    patience: int = 15
     transformer: TransformerConfig = TransformerConfig()
     lstm: LSTMConfig = LSTMConfig()
 

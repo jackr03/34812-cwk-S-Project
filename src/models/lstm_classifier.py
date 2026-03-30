@@ -10,7 +10,12 @@ class LSTMClassifier(nn.Module):
     def __init__(self, tokeniser: LSTMTokeniser):
         super().__init__()
 
-        self.embedding = nn.Embedding.from_pretrained(tokeniser.glove.vectors, freeze=False, padding_idx=0)
+        vectors = tokeniser.glove.vectors
+        pad = torch.zeros(1, vectors.shape[1])
+        unk = torch.zeros(1, vectors.shape[1])
+        matrix = torch.cat([pad, unk, vectors], dim=0)
+
+        self.embedding = nn.Embedding.from_pretrained(matrix, freeze=False, padding_idx=0)
         self.dropout = nn.Dropout(CONFIG.lstm.dropout)
 
         self.encode_lstm = nn.LSTM(
@@ -51,7 +56,7 @@ class LSTMClassifier(nn.Module):
 
         p_mask = premise_mask.unsqueeze(2).float()
         h_mask = hypothesis_mask.unsqueeze(1).float()
-        scores = scores.masked_fill((p_mask * h_mask) == 0, -1e9)
+        scores = scores.masked_fill((p_mask * h_mask) == 0, -1e4)
 
         p_aligned = torch.bmm(torch.softmax(scores, dim=2), h_encoded)
         h_aligned = torch.bmm(torch.softmax(scores, dim=1).transpose(1, 2), p_encoded)
@@ -71,8 +76,8 @@ class LSTMClassifier(nn.Module):
         p_avg = (p_composed * p_mask_exp).sum(dim=1) / p_mask_exp.sum(dim=1).clamp(min=1)
         h_avg = (h_composed * h_mask_exp).sum(dim=1) / h_mask_exp.sum(dim=1).clamp(min=1)
 
-        p_max = p_composed.masked_fill(p_mask_exp == 0, -1e9).max(dim=1).values
-        h_max = h_composed.masked_fill(h_mask_exp == 0, -1e9).max(dim=1).values
+        p_max = p_composed.masked_fill(p_mask_exp == 0, -1e4).max(dim=1).values
+        h_max = h_composed.masked_fill(h_mask_exp == 0, -1e4).max(dim=1).values
 
         pooled = torch.cat([p_avg, p_max, h_avg, h_max], dim=-1)
         return self.classifier(pooled)
