@@ -128,12 +128,12 @@ def main():
     print('=' * 60)
     print()
 
-    print('Training BiLSTM model...')
+    print('Training LSTM model...')
     best_acc = 0.0
+    patience = 0
     train_losses, train_accs = [], []
     val_losses, val_accs = [], []
     total_start = time.time()
-    patience = 0
     for epoch in range(CONFIG.epochs):
         epoch_start = time.time()
         print(f'[Epoch {epoch + 1}/{CONFIG.epochs}]')

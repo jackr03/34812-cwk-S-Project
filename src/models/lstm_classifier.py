@@ -37,7 +37,7 @@ class LSTMClassifier(nn.Module):
             nn.LazyLinear(CONFIG.lstm.hidden_dim),
             nn.ReLU(),
             nn.Dropout(CONFIG.lstm.dropout),
-            nn.Linear(CONFIG.lstm.hidden_dim, CONFIG.lstm.num_layers)
+            nn.Linear(CONFIG.lstm.hidden_dim, 2)
         )
 
     def forward(self, premise_ids: Tensor, premise_mask: Tensor, hypothesis_ids: Tensor, hypothesis_mask: Tensor) -> Tensor:
@@ -68,7 +68,7 @@ class LSTMClassifier(nn.Module):
         p_mask_exp = premise_mask.unsqueeze(-1).float()
         h_mask_exp = hypothesis_mask.unsqueeze(-1).float()
 
-        p_avg = (h_composed * p_mask_exp).sum(dim=1) / p_mask_exp.sum(dim=1).clamp(min=1)
+        p_avg = (p_composed * p_mask_exp).sum(dim=1) / p_mask_exp.sum(dim=1).clamp(min=1)
         h_avg = (h_composed * h_mask_exp).sum(dim=1) / h_mask_exp.sum(dim=1).clamp(min=1)
 
         p_max = p_composed.masked_fill(p_mask_exp == 0, -1e9).max(dim=1).values
@@ -76,7 +76,3 @@ class LSTMClassifier(nn.Module):
 
         pooled = torch.cat([p_avg, p_max, h_avg, h_max], dim=-1)
         return self.classifier(pooled)
-
-
-    def get_param_groups(self, lr: float) -> list[dict]:
-        return [{'params': self.parameters(), 'lr': lr}]
