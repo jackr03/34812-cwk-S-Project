@@ -15,14 +15,15 @@ from src.models.lstm_classifier import LSTMClassifier
 def run_hyperparameter_sweep(device, lstm_tokeniser: LSTMTokeniser, train_dataloader: DataLoader, val_dataloader: DataLoader, output_path: Path) -> None:
     def objective(trial) -> float:
         lr = trial.suggest_float('lr', 1e-4, 1e-2, log=True)
+        weight_decay = trial.suggeset_float('weight_decay', 1e-5, 1e-2, log=True)
 
         model = LSTMClassifier(lstm_tokeniser).to(device)
-        optimiser = torch.optim.Adam(model.parameters(), lr=lr)
+        optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
         criterion = nn.CrossEntropyLoss()
 
         val_acc = 0.0
         for epoch in range(CONFIG.lstm.hyperparameter_tuning.epochs):
-            train_one_epoch(device, model, criterion, optimiser, train_dataloader)
+            train_one_epoch(device, model, criterion, optimizer, train_dataloader)
             _, val_acc = validate(device, model, criterion, val_dataloader)
 
             trial.report(val_acc, epoch)

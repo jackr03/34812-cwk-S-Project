@@ -1,8 +1,3 @@
-from src.lstm_utils.lstm_dataset import LSTMDataset
-from src.lstm_utils.lstm_tokeniser import LSTMTokeniser
-from src.lstm_utils.lstm_training import validate, evaluate, train_one_epoch
-from src.lstm_utils.lstm_tuning import run_hyperparameter_sweep
-
 import argparse
 import json
 import time
@@ -13,6 +8,10 @@ from torch import nn
 from torch.utils.data import DataLoader
 
 from src.config import CONFIG
+from src.lstm_utils.lstm_dataset import LSTMDataset
+from src.lstm_utils.lstm_tokeniser import LSTMTokeniser
+from src.lstm_utils.lstm_training import validate, evaluate, train_one_epoch
+from src.lstm_utils.lstm_tuning import run_hyperparameter_sweep
 from src.models.lstm_classifier import LSTMClassifier
 from src.utils import plot_training_history
 
@@ -70,7 +69,7 @@ def main():
     print()
 
     model = LSTMClassifier(lstm_tokeniser).to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=hyperparameters['lr'])
+    optimizer = torch.optim.AdamW(model.parameters(), lr=hyperparameters["lr"], weight_decay=hyperparameters["weight_decay"])
     criterion = nn.CrossEntropyLoss()
 
     device_info = get_device_info(device)
