@@ -10,7 +10,7 @@ class TransformerHyperparameterTuningConfig:
 
 
 @dataclass(frozen=True)
-class BiLSTMHyperparameterTuningConfig:
+class LSTMHyperparameterTuningConfig:
     epochs: int = 3
     trials: int = 20
     should_run: bool = True
@@ -24,12 +24,13 @@ class TransformerConfig:
 
 
 @dataclass(frozen=True)
-class BiLSTMConfig:
-    embedding_dim: int = 128
+class LSTMConfig:
+    embedding_dim: int = 300
     hidden_dim: int = 256
     num_layers: int = 2
+    dropout: float = 0.5
     max_length: int = 64
-    hyperparameter_tuning: BiLSTMHyperparameterTuningConfig = BiLSTMHyperparameterTuningConfig()
+    hyperparameter_tuning: LSTMHyperparameterTuningConfig = LSTMHyperparameterTuningConfig()
 
 
 @dataclass(frozen=True)
@@ -39,6 +40,6 @@ class Config:
     batch_size: int = 256
     epochs: int = 20
     transformer: TransformerConfig = TransformerConfig()
-    bilstm: BiLSTMConfig = BiLSTMConfig()
+    lstm: LSTMConfig = LSTMConfig()
 
 CONFIG = Config()

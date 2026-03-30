@@ -14,7 +14,7 @@ from tqdm import tqdm
 from transformers import AutoTokenizer
 
 from src.config import CONFIG
-from src.models.bilstm_classifier import BiLSTMClassifier
+from src.models.lstm_classifier import LSTMClassifier
 from src.models.nli_dataset import NLIDataset
 from src.utils import run_sweep, plot_training_history
 
@@ -96,7 +96,7 @@ def validate(device, model, criterion, val_dataloader) -> tuple[float, float]:
 
 def evaluate_test(device, model, tokeniser, test_path: Path) -> dict:
     test_pd = pd.read_csv(test_path)
-    test_dataset = NLIDataset(test_pd, tokeniser, CONFIG.bilstm.max_length)
+    test_dataset = NLIDataset(test_pd, tokeniser, CONFIG.lstm.max_length)
     test_dataloader = DataLoader(test_dataset, batch_size=CONFIG.batch_size, shuffle=False, num_workers=4, pin_memory=True)
 
     model.eval()
@@ -144,8 +144,8 @@ def main():
     val_pd = pd.read_csv(VAL_DATA_PATH)
 
     tokeniser = AutoTokenizer.from_pretrained(CONFIG.transformer.model)
-    train_dataset = NLIDataset(train_pd, tokeniser, CONFIG.bilstm.max_length)
-    val_dataset = NLIDataset(val_pd, tokeniser, CONFIG.bilstm.max_length)
+    train_dataset = NLIDataset(train_pd, tokeniser, CONFIG.lstm.max_length)
+    val_dataset = NLIDataset(val_pd, tokeniser, CONFIG.lstm.max_length)
 
     train_dataloader = DataLoader(train_dataset, generator=generator, batch_size=CONFIG.batch_size, shuffle=True, drop_last=True, num_workers=4, pin_memory=True)
     val_dataloader = DataLoader(val_dataset, generator=generator, batch_size=CONFIG.batch_size, shuffle=False, num_workers=4, pin_memory=True)
@@ -154,12 +154,12 @@ def main():
         lr = trial.suggest_float('lr', 1e-4, 1e-2, log=True)
         dropout = trial.suggest_float('dropout', 0.1, 0.5)
 
-        model = BiLSTMClassifier(num_labels=2, dropout=dropout).to(device)
+        model = LSTMClassifier(num_labels=2, dropout=dropout).to(device)
         optimiser = torch.optim.Adam(model.get_param_groups(lr=lr))
         criterion = nn.CrossEntropyLoss()
 
         val_acc = 0.0
-        for epoch in range(CONFIG.bilstm.hyperparameter_tuning.epochs):
+        for epoch in range(CONFIG.lstm.hyperparameter_tuning.epochs):
             train_one_epoch(device, model, criterion, optimiser, train_dataloader)
             val_loss, val_acc = validate(device, model, criterion, val_dataloader)
 
@@ -169,15 +169,15 @@ def main():
 
         return val_acc
 
-    if CONFIG.bilstm.hyperparameter_tuning.should_run:
+    if CONFIG.lstm.hyperparameter_tuning.should_run:
         print('Running hyperparameter sweep...')
-        run_sweep(objective, HYPERPARAMETERS_PATH, CONFIG.bilstm.hyperparameter_tuning.trials)
+        run_sweep(objective, HYPERPARAMETERS_PATH, CONFIG.lstm.hyperparameter_tuning.trials)
 
     hyperparameters = json.load(open(HYPERPARAMETERS_PATH, 'r'))
     print(f'Hyperparameters used: {hyperparameters}')
     print()
 
-    model = BiLSTMClassifier(num_labels=2, dropout=hyperparameters['dropout']).to(device)
+    model = LSTMClassifier(num_labels=2, dropout=hyperparameters['dropout']).to(device)
     optimiser = torch.optim.Adam(model.get_param_groups(lr=hyperparameters['lr']))
     criterion = nn.CrossEntropyLoss()
 
@@ -185,7 +185,7 @@ def main():
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
     device_info = get_device_info(device)
-    cfg = CONFIG.bilstm
+    cfg = CONFIG.lstm
 
     config_summary = {
         'model': 'BiLSTM',

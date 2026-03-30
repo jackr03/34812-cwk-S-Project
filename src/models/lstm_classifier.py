@@ -1,0 +1,82 @@
+import torch
+import torch.nn as nn
+from torch import Tensor
+
+from src.config import CONFIG
+from src.lstm_utils.lstm_tokeniser import LSTMTokeniser
+
+
+class LSTMClassifier(nn.Module):
+    def __init__(self, tokeniser: LSTMTokeniser):
+        super().__init__()
+
+        self.embedding = nn.Embedding.from_pretrained(tokeniser.glove.vectors, freeze=False, padding_idx=0)
+        self.dropout = nn.Dropout(CONFIG.lstm.dropout)
+
+        self.encode_lstm = nn.LSTM(
+            input_size=CONFIG.lstm.embedding_dim,
+            hidden_size=CONFIG.lstm.hidden_dim,
+            bidirectional=True,
+            batch_first=True
+        )
+
+        self.projection = nn.Sequential(
+            nn.LazyLinear(CONFIG.lstm.hidden_dim),
+            nn.ReLU(),
+            nn.Dropout(CONFIG.lstm.dropout),
+        )
+
+        self.compose_lstm = nn.LSTM(
+            input_size=CONFIG.lstm.hidden_dim,
+            hidden_size=CONFIG.lstm.hidden_dim,
+            bidirectional=True,
+            batch_first=True
+        )
+
+        self.classifier = nn.Sequential(
+            nn.LazyLinear(CONFIG.lstm.hidden_dim),
+            nn.ReLU(),
+            nn.Dropout(CONFIG.lstm.dropout),
+            nn.Linear(CONFIG.lstm.hidden_dim, CONFIG.lstm.num_layers)
+        )
+
+    def forward(self, premise_ids: Tensor, premise_mask: Tensor, hypothesis_ids: Tensor, hypothesis_mask: Tensor) -> Tensor:
+        p_embedding = self.dropout(self.embedding(premise_ids))
+        h_embedding = self.dropout(self.embedding(hypothesis_ids))
+
+        p_encoded, _ = self.encode_lstm(p_embedding)
+        h_encoded, _ = self.encode_lstm(h_embedding)
+
+        scores = torch.bmm(p_encoded, h_encoded.transpose(1, 2))
+
+        p_mask = premise_mask.unsqueeze(2).float()
+        h_mask = hypothesis_mask.unsqueeze(1).float()
+        scores = scores.masked_fill((p_mask * h_mask) == 0, -1e9)
+
+        p_aligned = torch.bmm(torch.softmax(scores, dim=2), h_encoded)
+        h_aligned = torch.bmm(torch.softmax(scores, dim=1).transpose(1, 2), p_encoded)
+
+        p_enhanced = torch.cat([p_encoded, p_aligned, p_encoded - p_aligned, p_encoded * p_aligned], dim=-1)
+        h_enhanced = torch.cat([h_encoded, h_aligned, h_encoded - h_aligned, h_encoded * h_aligned], dim=-1)
+
+        p_projected = self.projection(p_enhanced)
+        h_projected = self.projection(h_enhanced)
+
+        p_composed, _ = self.compose_lstm(p_projected)
+        h_composed, _ = self.compose_lstm(h_projected)
+
+        p_mask_exp = premise_mask.unsqueeze(-1).float()
+        h_mask_exp = hypothesis_mask.unsqueeze(-1).float()
+
+        p_avg = (h_composed * p_mask_exp).sum(dim=1) / p_mask_exp.sum(dim=1).clamp(min=1)
+        h_avg = (h_composed * h_mask_exp).sum(dim=1) / h_mask_exp.sum(dim=1).clamp(min=1)
+
+        p_max = p_composed.masked_fill(p_mask_exp == 0, -1e9).max(dim=1).values
+        h_max = h_composed.masked_fill(h_mask_exp == 0, -1e9).max(dim=1).values
+
+        pooled = torch.cat([p_avg, p_max, h_avg, h_max], dim=-1)
+        return self.classifier(pooled)
+
+
+    def get_param_groups(self, lr: float) -> list[dict]:
+        return [{'params': self.parameters(), 'lr': lr}]
