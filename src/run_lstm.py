@@ -75,9 +75,6 @@ def main():
     optimizer = torch.optim.Adam(model.parameters(), lr=hyperparameters['lr'])
     criterion = nn.CrossEntropyLoss()
 
-    total_params = sum(p.numel() for p in model.parameters())
-    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-
     device_info = get_device_info(device)
     cfg = CONFIG.lstm
 
@@ -87,8 +84,6 @@ def main():
         'embedding_dim': cfg.embedding_dim,
         'hidden_dim': cfg.hidden_dim,
         'num_layers': cfg.num_layers,
-        'total_params': total_params,
-        'trainable_params': trainable_params,
         'epochs': CONFIG.epochs,
         'batch_size': CONFIG.batch_size,
         'learning_rate': hyperparameters['lr'],
@@ -114,8 +109,6 @@ def main():
     print(f'  Embedding dim:     {cfg.embedding_dim}')
     print(f'  Hidden dim:        {cfg.hidden_dim}')
     print(f'  Num layers:        {cfg.num_layers}')
-    print(f'  Total params:      {total_params:,}')
-    print(f'  Trainable params:  {trainable_params:,}')
     print(f'  Epochs:            {CONFIG.epochs}')
     print(f'  Batch size:        {CONFIG.batch_size}')
     print(f'  Learning rate:     {hyperparameters["lr"]:.6f}')

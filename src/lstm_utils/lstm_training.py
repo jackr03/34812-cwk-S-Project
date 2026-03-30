@@ -36,7 +36,7 @@ def train_one_epoch(device, model, criterion, optimiser, train_dataloader: DataL
         correct += (predictions == labels).sum().item()
         total += labels.size(0)
 
-    avg_loss = total_loss / total
+    avg_loss = total_loss / len(train_dataloader)
     accuracy = correct / total
 
     return avg_loss, accuracy
@@ -67,7 +67,7 @@ def validate(device, model, criterion, val_dataloader: DataLoader) -> tuple[floa
             correct += (predictions == labels).sum().item()
             total += labels.size(0)
 
-    avg_loss = total_loss / total
+    avg_loss = total_loss / len(val_dataloader)
     accuracy = correct / total
 
     return avg_loss, accuracy
