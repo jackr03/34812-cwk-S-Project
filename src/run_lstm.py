@@ -3,7 +3,6 @@ from src.lstm_utils.lstm_tokeniser import LSTMTokeniser
 from src.lstm_utils.lstm_training import validate, evaluate, train_one_epoch
 from src.lstm_utils.lstm_tuning import run_hyperparameter_sweep
 
-print('Starting BiLSTM training script...')
 import argparse
 import json
 import time
@@ -17,11 +16,10 @@ from src.config import CONFIG
 from src.models.lstm_classifier import LSTMClassifier
 from src.utils import plot_training_history
 
-print('Imports complete')
-
 TRAIN_DATA_PATH = Path('data/train.csv')
 VAL_DATA_PATH = Path('data/dev.csv')
 TEST_DATA_PATH = Path('data/NLI_trial.csv')
+
 HYPERPARAMETERS_PATH = Path('hyperparameters/lstm.json')
 MODEL_PATH = Path('models/lstm.pt')
 
@@ -155,9 +153,8 @@ def main():
 
         epoch_time = time.time() - epoch_start
         elapsed = time.time() - total_start
-        print(f'[Train] Loss: {train_loss:.2f} | Accuracy: {train_acc:.2f}%')
-        print(f'[Val]   Loss: {val_loss:.2f}   | Accuracy: {val_acc:.2f}%')
-        print(f'[Time]  Epoch: {epoch_time:.1f}s | Total: {elapsed:.1f}s')
+        print(f'Train Loss: {train_loss:.2f} | Train Acc: {train_acc:.2f}% | Val Loss: {val_loss:.2f} | Val Acc: {val_acc:.2f}%')
+        print(f'Epoch time: {epoch_time:.1f}s | Total elapsed: {elapsed:.1f}s')
         print()
 
         if patience == CONFIG.patience:

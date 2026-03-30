@@ -50,7 +50,9 @@ class LSTMClassifier(nn.Module):
         h_embedding = self.dropout(self.embedding(hypothesis_ids))
 
         p_encoded, _ = self.encode_lstm(p_embedding)
+        p_encoded = self.dropout(p_encoded)
         h_encoded, _ = self.encode_lstm(h_embedding)
+        h_encoded = self.dropout(h_encoded)
 
         scores = torch.bmm(p_encoded, h_encoded.transpose(1, 2))
 
@@ -68,7 +70,9 @@ class LSTMClassifier(nn.Module):
         h_projected = self.projection(h_enhanced)
 
         p_composed, _ = self.compose_lstm(p_projected)
+        p_composed = self.dropout(p_composed)
         h_composed, _ = self.compose_lstm(h_projected)
+        h_composed = self.dropout(h_composed)
 
         p_mask_exp = premise_mask.unsqueeze(-1).float()
         h_mask_exp = hypothesis_mask.unsqueeze(-1).float()
