@@ -13,7 +13,7 @@ class TransformerHyperparameterTuningConfig:
 class LSTMHyperparameterTuningConfig:
     epochs: int = 3
     trials: int = 20
-    should_run: bool = True
+    should_run: bool = False
 
 
 @dataclass(frozen=True)
@@ -39,7 +39,8 @@ class Config:
     project_root = Path(__file__).resolve().parent.parent
     seed: int = 100
     batch_size: int = 256
-    epochs: int = 20
+    epochs: int = 100
+    patience: int = 20
     transformer: TransformerConfig = TransformerConfig()
     lstm: LSTMConfig = LSTMConfig()
 

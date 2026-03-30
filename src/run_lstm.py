@@ -133,6 +133,7 @@ def main():
     train_losses, train_accs = [], []
     val_losses, val_accs = [], []
     total_start = time.time()
+    patience = 0
     for epoch in range(CONFIG.epochs):
         epoch_start = time.time()
         print(f'[Epoch {epoch + 1}/{CONFIG.epochs}]')
@@ -148,21 +149,28 @@ def main():
         if val_acc > best_acc:
             best_acc = val_acc
             torch.save(model.state_dict(), MODEL_PATH)
+            patience = 0
+        else:
+            patience += 1
+
+        if patience == CONFIG.patience:
+            print(f'Finishing training early, no improvement in {CONFIG.patience} epochs')
+            break
 
         epoch_time = time.time() - epoch_start
         elapsed = time.time() - total_start
-        print(f'Train Loss: {train_loss:.2f} | Train Accuracy: {train_acc * 100:.2f}% | Val Loss: {val_loss:.2f} | Val Accuracy: {val_acc * 100:.2f}%')
+        print(f'Train Loss: {train_loss:.2f} | Train Accuracy: {train_acc:.2f}% | Val Loss: {val_loss:.2f} | Val Accuracy: {val_acc:.2f}%')
         print(f'Epoch time: {epoch_time:.1f}s | Total elapsed: {elapsed:.1f}s')
         print()
 
     total_time = time.time() - total_start
     print(f'Training complete in {total_time:.1f}s')
-    print(f'Best model had an accuracy of {best_acc * 100:.2f}%.')
+    print(f'Best model had an accuracy of {best_acc:.2f}%.')
 
     print('Running final evaluation on NLI_trial.csv...')
     model.load_state_dict(torch.load(MODEL_PATH))
     test_results = evaluate(device, model, test_dataloader)
-    print(f'NLI_trial — Accuracy: {test_results["accuracy"] * 100:.2f}% | F1 (weighted): {test_results["f1_weighted"]:.4f}')
+    print(f'NLI_trial — Accuracy: {test_results["accuracy"]:.2f}% | F1 (weighted): {test_results["f1_weighted"]:.4f}')
 
     results = {
         'training_time_seconds': round(total_time, 1),

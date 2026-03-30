@@ -30,6 +30,7 @@ def train_one_epoch(device, model, criterion, optimiser, train_dataloader: DataL
 
         loss.backward()
         optimiser.step()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=5.0)  
 
         total_loss += loss.item()
         predictions = logits.argmax(dim=1)
@@ -37,7 +38,7 @@ def train_one_epoch(device, model, criterion, optimiser, train_dataloader: DataL
         total += labels.size(0)
 
     avg_loss = total_loss / len(train_dataloader)
-    accuracy = correct / total
+    accuracy = correct / total * 100
 
     return avg_loss, accuracy
 
@@ -68,7 +69,7 @@ def validate(device, model, criterion, val_dataloader: DataLoader) -> tuple[floa
             total += labels.size(0)
 
     avg_loss = total_loss / len(val_dataloader)
-    accuracy = correct / total
+    accuracy = correct / total * 100
 
     return avg_loss, accuracy
 
@@ -96,7 +97,7 @@ def evaluate(device, model, test_dataloader: DataLoader) -> dict:
             all_preds.extend(preds.cpu().tolist())
             all_labels.extend(labels.cpu().tolist())
 
-    accuracy = sum(p == l for p, l in zip(all_preds, all_labels)) / len(all_labels)
+    accuracy = sum(p == l for p, l in zip(all_preds, all_labels)) / len(all_labels) * 100
     f1 = f1_score(all_labels, all_preds, average='weighted')
 
     return {
