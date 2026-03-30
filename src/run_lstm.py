@@ -83,8 +83,8 @@ def main():
         'max_seq_length': cfg.max_length,
         'embedding_dim': cfg.embedding_dim,
         'hidden_dim': cfg.hidden_dim,
-        'num_layers': cfg.num_layers,
         'epochs': CONFIG.epochs,
+        'patience': CONFIG.patience,
         'batch_size': CONFIG.batch_size,
         'learning_rate': hyperparameters['lr'],
         'optimizer': 'Adam',
@@ -108,8 +108,8 @@ def main():
     print(f'  Max seq length:    {cfg.max_length}')
     print(f'  Embedding dim:     {cfg.embedding_dim}')
     print(f'  Hidden dim:        {cfg.hidden_dim}')
-    print(f'  Num layers:        {cfg.num_layers}')
     print(f'  Epochs:            {CONFIG.epochs}')
+    print(f'  Patience:          {CONFIG.patience}')
     print(f'  Batch size:        {CONFIG.batch_size}')
     print(f'  Learning rate:     {hyperparameters["lr"]:.6f}')
     print(f'  Optimizer:         Adam')
@@ -156,8 +156,8 @@ def main():
         epoch_time = time.time() - epoch_start
         elapsed = time.time() - total_start
         print(f'[Train] Loss: {train_loss:.2f} | Accuracy: {train_acc:.2f}%')
-        print(f'[Val] Loss: {val_loss:.2f} | Accuracy: {val_acc:.2f}%')
-        print(f'Epoch time: {epoch_time:.1f}s | Total elapsed: {elapsed:.1f}s')
+        print(f'[Val]   Loss: {val_loss:.2f}   | Accuracy: {val_acc:.2f}%')
+        print(f'[Time]  Epoch: {epoch_time:.1f}s | Total: {elapsed:.1f}s')
         print()
 
         if patience == CONFIG.patience:

@@ -28,7 +28,6 @@ class LSTMConfig:
     show_progress: bool = False
     embedding_dim: int = 300
     hidden_dim: int = 256
-    num_layers: int = 2
     dropout: float = 0.5
     max_length: int = 64
     hyperparameter_tuning: LSTMHyperparameterTuningConfig = LSTMHyperparameterTuningConfig()
