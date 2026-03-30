@@ -1,5 +1,5 @@
 import torch
-from sklearn.metrics import f1_score, precision_score, recall_score
+from sklearn.metrics import classification_report
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
@@ -97,12 +97,14 @@ def evaluate(device, model, test_dataloader: DataLoader) -> dict:
             all_preds.extend(preds.cpu().tolist())
             all_labels.extend(labels.cpu().tolist())
 
+    report = classification_report(all_labels, all_preds, output_dict=True)
+
     return {
-        'accuracy': sum(p == l for p, l in zip(all_preds, all_labels)) / len(all_labels) * 100,
-        'macro_precision': precision_score(all_labels, all_preds, average='macro'),
-        'macro_recall': recall_score(all_labels, all_preds, average='macro'),
-        'macro_f1': f1_score(all_labels, all_preds, average='macro'),
-        'weighted_precision': precision_score(all_labels, all_preds, average='weighted'),
-        'weighted_recall': recall_score(all_labels, all_preds, average='weighted'),
-        'weighted_f1': f1_score(all_labels, all_preds, average='weighted')
+        'accuracy': report['accuracy'],
+        'macro_precision': report['macro avg']['precision'],
+        'macro_recall': report['macro avg']['recall'],
+        'macro_f1': report['macro avg']['f1-score'],
+        'weighted_precision': report['weighted avg']['precision'],
+        'weighted_recall': report['weighted avg']['recall'],
+        'weighted_f1': report['weighted avg']['f1-score'],
     }
