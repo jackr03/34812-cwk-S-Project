@@ -31,7 +31,7 @@ echo "Installing requirements..."
 pip install --quiet -r "$BASE/requirements/requirements-hpc.txt"
 echo "Install complete at $(date)"
 
-export PYTHONPATH="$BASE:$PYTHONPATH"
+export PYTHONPATH="$BASE:${PYTHONPATH:-}"
 
 echo "===== Training started at $(date) ====="
 CUDA_VISIBLE_DEVICES=0 python -u -m src.run_lstm --run-dir "$RUN_DIR"

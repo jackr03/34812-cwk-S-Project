@@ -68,7 +68,7 @@ def main():
     print(f'Hyperparameters used: {hyperparameters}')
     print()
 
-    model = LSTMClassifier(lstm_tokeniser).to(device)
+    model = LSTMClassifier(lstm_tokeniser, dropout=hyperparameters['dropout']).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=hyperparameters["lr"], weight_decay=hyperparameters["weight_decay"])
     criterion = nn.CrossEntropyLoss()
 
@@ -83,8 +83,9 @@ def main():
         'epochs': CONFIG.epochs,
         'patience': CONFIG.patience,
         'batch_size': CONFIG.batch_size,
-        'learning_rate': hyperparameters['lr'],
-        'optimizer': 'Adam',
+        'learning_rate': hyperparameters["lr"],
+        'weight_decay': hyperparameters["weight_decay"],
+        'optimizer': 'AdamW',
         'loss_function': 'CrossEntropyLoss',
         'seed': CONFIG.seed,
         'device': device_info,
@@ -109,7 +110,8 @@ def main():
     print(f'  Patience:          {CONFIG.patience}')
     print(f'  Batch size:        {CONFIG.batch_size}')
     print(f'  Learning rate:     {hyperparameters["lr"]:.6f}')
-    print(f'  Optimizer:         Adam')
+    print(f'  Weight decay:      {hyperparameters["weight_decay"]:.6f}')
+    print(f'  Optimizer:         AdamW')
     print(f'  Loss function:     CrossEntropyLoss')
     print(f'  Seed:              {CONFIG.seed}')
     print(f'  Device:            {device_info["type"]}')

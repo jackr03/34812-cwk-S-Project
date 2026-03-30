@@ -7,7 +7,7 @@ from src.lstm_utils.lstm_tokeniser import LSTMTokeniser
 
 
 class LSTMClassifier(nn.Module):
-    def __init__(self, tokeniser: LSTMTokeniser):
+    def __init__(self, tokeniser: LSTMTokeniser, dropout: float):
         super().__init__()
 
         vectors = tokeniser.glove.vectors
@@ -16,7 +16,7 @@ class LSTMClassifier(nn.Module):
         matrix = torch.cat([pad, unk, vectors], dim=0)
 
         self.embedding = nn.Embedding.from_pretrained(matrix, freeze=True, padding_idx=0)
-        self.dropout = nn.Dropout(CONFIG.lstm.dropout)
+        self.dropout = nn.Dropout(dropout)
 
         self.encode_lstm = nn.LSTM(
             input_size=CONFIG.lstm.embedding_dim,
@@ -28,7 +28,7 @@ class LSTMClassifier(nn.Module):
         self.projection = nn.Sequential(
             nn.LazyLinear(CONFIG.lstm.hidden_dim),
             nn.ReLU(),
-            nn.Dropout(CONFIG.lstm.dropout),
+            nn.Dropout(dropout),
         )
 
         self.compose_lstm = nn.LSTM(
@@ -41,7 +41,7 @@ class LSTMClassifier(nn.Module):
         self.classifier = nn.Sequential(
             nn.LazyLinear(CONFIG.lstm.hidden_dim),
             nn.ReLU(),
-            nn.Dropout(CONFIG.lstm.dropout),
+            nn.Dropout(dropout),
             nn.Linear(CONFIG.lstm.hidden_dim, 2)
         )
 
