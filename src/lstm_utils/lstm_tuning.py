@@ -8,9 +8,8 @@ from torch.utils.data import DataLoader
 
 from src.config import CONFIG
 from src.lstm_utils.lstm_tokeniser import LSTMTokeniser
-from src.lstm_utils.lstm_training import train_one_epoch
+from src.lstm_utils.lstm_training import train_one_epoch, validate
 from src.models.lstm_classifier import LSTMClassifier
-from src.run_transformer import validate
 
 
 def run_hyperparameter_sweep(device, lstm_tokeniser: LSTMTokeniser, train_dataloader: DataLoader, val_dataloader: DataLoader, output_path: Path) -> None:
