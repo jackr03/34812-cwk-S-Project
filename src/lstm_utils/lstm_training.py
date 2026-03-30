@@ -3,6 +3,8 @@ from sklearn.metrics import f1_score
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
+from src.config import CONFIG
+
 
 def train_one_epoch(device, model, criterion, optimiser, train_dataloader: DataLoader) -> tuple[float, float]:
     model.train()
@@ -10,7 +12,11 @@ def train_one_epoch(device, model, criterion, optimiser, train_dataloader: DataL
     total_loss = 0.0
     correct = 0
     total = 0
-    for batch in tqdm(train_dataloader, desc='Training', unit='batches'):
+
+    if CONFIG.lstm.show_progress:
+        train_dataloader = tqdm(train_dataloader, desc='Training', unit='batches')
+
+    for batch in train_dataloader:
         premise_ids = batch['premise_ids'].to(device)
         premise_mask = batch['premise_mask'].to(device)
         hypothesis_ids = batch['hypothesis_ids'].to(device)
@@ -41,8 +47,12 @@ def validate(device, model, criterion, val_dataloader: DataLoader) -> tuple[floa
     total_loss = 0.0
     correct = 0
     total = 0
+
+    if CONFIG.lstm.show_progress:
+        val_dataloader = tqdm(val_dataloader, desc='Validating', unit='batches')
+
     with torch.inference_mode():
-        for batch in tqdm(val_dataloader, desc='Validating', unit='batches'):
+        for batch in val_dataloader:
             premise_ids = batch['premise_ids'].to(device)
             premise_mask = batch['premise_mask'].to(device)
             hypothesis_ids = batch['hypothesis_ids'].to(device)
@@ -68,8 +78,12 @@ def evaluate(device, model, test_dataloader: DataLoader) -> dict:
 
     all_preds = []
     all_labels = []
+
+    if CONFIG.lstm.show_progress:
+        test_dataloader = tqdm(test_dataloader, desc='Evaluating NLI_trial', unit='batches')
+
     with torch.inference_mode():
-        for batch in tqdm(test_dataloader, desc='Evaluating NLI_trial', unit='batches'):
+        for batch in test_dataloader:
             premise_ids = batch['premise_ids'].to(device)
             premise_mask = batch['premise_mask'].to(device)
             hypothesis_ids = batch['hypothesis_ids'].to(device)

@@ -25,6 +25,7 @@ class TransformerConfig:
 
 @dataclass(frozen=True)
 class LSTMConfig:
+    show_progress: bool = False
     embedding_dim: int = 300
     hidden_dim: int = 256
     num_layers: int = 2
