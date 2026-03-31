@@ -1,7 +1,5 @@
-import json
 from pathlib import Path
 
-import optuna
 from matplotlib import pyplot as plt
 
 

@@ -12,9 +12,10 @@ set -euo pipefail
 module load apps/binapps/conda/miniforge3/25.9.1
 module load libs/cuda/12.4.1
 
-BASE="/mnt/iusers01/fse-ugpgt01/compsci01/j84846ky/scratch/34812-cwk-S-Project"
+#BASE="/mnt/iusers01/fse-ugpgt01/compsci01/j84846ky/scratch/34812-cwk-S-Project"
+BASE="/mnt/iusers01/fse-ugpgt01/compsci01/x06213zr/scratch/34812-cwk-S-Project"
 
-RUN_DIR="$BASE/runs/bilstm/$(date +%Y-%m-%d_%H-%M)"
+RUN_DIR="$BASE/runs/lstm/$(date +%Y-%m-%d_%H-%M)"
 mkdir -p "$RUN_DIR/plots"
 
 exec > >(tee -a "$RUN_DIR/output.log") 2>&1
@@ -30,8 +31,8 @@ echo "Installing requirements..."
 pip install --quiet -r "$BASE/requirements/requirements-hpc.txt"
 echo "Install complete at $(date)"
 
-export PYTHONPATH="$BASE:$PYTHONPATH"
+export PYTHONPATH="$BASE:${PYTHONPATH:-}"
 
 echo "===== Training started at $(date) ====="
-CUDA_VISIBLE_DEVICES=0 python -u -m src.run_bilstm --run-dir "$RUN_DIR"
+CUDA_VISIBLE_DEVICES=0 python -u -m src.run_lstm --run-dir "$RUN_DIR"
 echo "===== Training finished at $(date) ====="
