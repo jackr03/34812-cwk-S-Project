@@ -22,7 +22,7 @@ This is a binary Natural Language Inference (NLI) classification model that, giv
 
 <!-- Provide a longer summary of what this model is. -->
 
-This model is based on the Enhanced Sequential Inference Model (ESIM; Chen et al., 2017), implemented from scratch in PyTorch. It uses frozen GloVe (300-dimensional) word embeddings,
+This model is based on the Enhanced Sequential Inference Model (ESIM; Chen et al., 2017), implemented from scratch in PyTorch. It uses frozen 840B GloVe 300d word embeddings,
     a shared bidirectional LSTM encoder, a soft cross-attention alignment mechanism between premise and hypothesis, and a composition BiLSTM over the enhanced representations. The final classification head
     receives mean and max-pooled outputs from both sequences.
 
@@ -58,9 +58,10 @@ This model is based on the Enhanced Sequential Inference Model (ESIM; Chen et al
 
       - seed: 100
       - batch_size: 256
-      - num_epochs: 100
+      - num_epochs: 100 (early stopping if no improvement after 10 epochs)
       - learning_rate: 2e-3
       - dropout: 0.174
+      - optimizer: AdamW
       - weight_decay: 1.72e-05
 
 #### Speeds, Sizes, Times
@@ -89,14 +90,27 @@ This model is based on the Enhanced Sequential Inference Model (ESIM; Chen et al
 <!-- These are the evaluation metrics being used. -->
 
 
-      - Precision
-      - Recall
-      - F1-score
       - Accuracy
+      - Macro Precision
+      - Macro Recall
+      - Macro F1
+      - Weighted Precision
+      - Weighted Recall
+      - Weighted F1
+      
 
 ### Results
 
-The model obtained a macro F1-score of 0.73 and an accuracy of 73%.
+
+    Given a coursework baseline at ~66% accuracy and a macro F1 of ~0.66, we achieved:
+      - Accuracy:           73.06%
+      - Macro Precision:    0.7303
+      - Macro Recall:       0.7304
+      - Macro F1:           0.7303
+      - Weighted Precision: 0.7306
+      - Weighted Recall:    0.7306
+      - Weighted F1:        0.7306
+    
 
 ## Technical Specifications
 
@@ -118,7 +132,7 @@ The model obtained a macro F1-score of 0.73 and an accuracy of 73%.
 
 
     1. Any inputs (concatenation of two sequences) longer than 64 tokens are truncated, which may degrade accuracy on longer inputs.
-    2. The model cannot represent unseen vocabulary, as it relies on GloVe embeddings.
+    2. Tokens not found in GloVe are represented as zero vectors.
     3. The model was trained exclusively on English text and will not work with other languages.
 
 ## Additional Information
