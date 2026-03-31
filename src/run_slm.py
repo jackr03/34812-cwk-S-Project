@@ -5,6 +5,7 @@ import json
 import tempfile
 import time
 from dataclasses import replace
+from datetime import datetime
 from functools import partial
 from pathlib import Path
 
@@ -29,9 +30,8 @@ from src.utils import run_sweep
 
 print('Imports complete')
 
-TRAIN_DATA_PATH    = Path('data/train.csv')
-VAL_DATA_PATH      = Path('data/dev.csv')
-ADAPTER_PATH       = Path('models/slm_adapter')
+TRAIN_DATA_PATH      = Path('data/train.csv')
+VAL_DATA_PATH        = Path('data/dev.csv')
 HYPERPARAMETERS_PATH = Path('hyperparameters/slm.json')
 
 
@@ -112,7 +112,9 @@ def main():
 
     run_dir: Path = args.run_dir
     run_dir.mkdir(parents=True, exist_ok=True)
-    ADAPTER_PATH.parent.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M')
+    adapter_path = Path(f'models/slm_adapter_{timestamp}')
+    adapter_path.mkdir(parents=True, exist_ok=True)
 
     cfg_slm = CONFIG.slm
     cfg_ft  = CONFIG.slm_finetune
@@ -250,7 +252,7 @@ def main():
     print()
 
     sft_args = SFTConfig(
-        output_dir=str(ADAPTER_PATH),
+        output_dir=str(adapter_path),
         per_device_train_batch_size=cfg_ft.batch_size,
         gradient_accumulation_steps=cfg_ft.gradient_accumulation_steps,
         learning_rate=cfg_ft.learning_rate,
@@ -280,9 +282,9 @@ def main():
     total_time = time.time() - total_start
     print(f'\nTraining complete in {total_time:.1f}s')
 
-    trainer.model.save_pretrained(str(ADAPTER_PATH))
-    tokeniser.save_pretrained(str(ADAPTER_PATH))
-    print(f'Adapter saved to {ADAPTER_PATH}')
+    trainer.model.save_pretrained(str(adapter_path))
+    tokeniser.save_pretrained(str(adapter_path))
+    print(f'Adapter saved to {adapter_path}')
 
     # Extract per-epoch losses from trainer log history
     train_losses = [e['loss']      for e in trainer.state.log_history if 'loss'      in e and 'eval_loss' not in e]
@@ -295,7 +297,7 @@ def main():
     print('=' * 60)
     print('Post Fine-Tuning Evaluation')
     print('=' * 60)
-    best_model, best_tokeniser = load_finetuned_for_inference(ADAPTER_PATH, cfg_slm, cfg_ft)
+    best_model, best_tokeniser = load_finetuned_for_inference(adapter_path, cfg_slm, cfg_ft)
     finetuned_dev = evaluate_test(device, best_model, best_tokeniser, VAL_DATA_PATH, cfg_slm)
     print(f'Fine-tuned dev — Acc: {finetuned_dev["accuracy"] * 100:.2f}%  F1: {finetuned_dev["f1_weighted"]:.4f}')
 
