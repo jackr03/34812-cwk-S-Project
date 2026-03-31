@@ -30,8 +30,7 @@ class TransformerConfig:
 
 @dataclass(frozen=True)
 class SLMConfig:
-    # Smoke-test model — swap to 'Qwen/Qwen3.5-9B-Base' for real run
-    model: str = 'Qwen/Qwen3.5-0.8B-Base'
+    model: str = 'Qwen/Qwen3.5-9B-Base'
     max_length: int = 256
     hyperparameter_tuning: SLMHyperparameterTuningConfig = SLMHyperparameterTuningConfig()
 
