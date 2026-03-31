@@ -46,7 +46,7 @@ This model is `Qwen/Qwen3.5-9B-Base` (~9B parameters) fine-tuned for binary NLI 
 <!-- Provide links where applicable. -->
 
 - **Repository:** https://huggingface.co/Qwen/Qwen3.5-9B-Base
-- **Paper or documentation:** https://arxiv.org/abs/2106.09685
+- **Paper or documentation:** https://qwen.ai/blog?id=qwen3.5
 
 ## Training Details
 
