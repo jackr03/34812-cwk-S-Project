@@ -212,6 +212,7 @@ runs/*/
 logs/*/
 
 # Other
+.DS_Store
 models/*
 !models/.gitkeep
 notebooks/.vector_cache
