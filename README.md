@@ -1,6 +1,5 @@
 # NLI Binary Classification
 
-Binary Natural Language Inference classifier using DeBERTa v3.
 Given a premise and hypothesis, predicts entailment (1) or non-entailment (0).
 
 ## Setup
@@ -25,32 +24,37 @@ pip install -r requirements-hpc.txt
 ### If you already created a .venv
 You can run the ```setup.sh``` script to activate the ```.venv``` and setup SSH for GitHub pushes.
 
-## Training
+---
 
-### Submit a Training Job
-- Change the ```#SBATCH --partition=gpuL``` for L40s or ```#SBATCH --partition=gpuL``` for A100s
-```bash
-sbatch jobs/train.job
-```
-- The job runs src/run_train.py
+## Running the LSTM demo notebook
+1. Set up the virtual environment (instructions above).
+2. Place the test set in `data/`.
+3. Download the pre-trained model from **[here](https://livemanchesterac-my.sharepoint.com/:u:/g/personal/zhijie_rong_student_manchester_ac_uk/IQAvXjxVpy5kQoAt6t9ovfjMAQY0HxVSJU1_vdAcb9J5Ao0?e=iEeUTf).**
+4. Move the downloaded `lstm.pt` to `models/`.
+5. Open `demo_lstm.ipynb` and run from the beginning. 
 
-### Viewing A Training Run
+Predictions will be saved to `output/`.
+Note that the first run will take longer as it requires downloading the GloVe vector.
 
-```
-|-- runs
-|   -- train_2026-03-19_23-42
-|       |-- config.json
-|       |-- output.log
-|       |-- plots
-|       |   -- training_history.png
-|       -- results.json
-```
-The above shows an example of ```runs/``` directory. Each job run creates 
-- ```output.log``` - this is where console output is saved
-- ```config.json``` - lists out all training and model parameters in ```json``` format
-- ```plots/``` - directory with training loss and validation plots.
-- ```results.json``` - saves accuracies, losses and f1 scores on training, dev and trial datasets.
+**Existing predictions are stored in the root at Group_40_B.csv**.
 
-Training config (learning rate, epochs, batch size, etc.) is in `src/train_config.py`.
-Model config (transformer model, seed) is in `src/config.py`.
+---
 
+## Attribution
+
+### Data
+- Training, development, and trial data provided as part of the COMP34812 coursework.
+
+### LSTM Solution
+- **Paper:** Chen, Q., Zhu, X., Ling, Z., Wei, S., Jiang, H., & Inkpen, D. (2017). *Enhanced LSTM for Natural Language Inference*. ACL 2017. https://arxiv.org/abs/1609.06038
+- **Reference implementation:** https://github.com/coetaur0/ESIM — used as a reference for the cross-attention alignment mechanism and overall ESIM architecture. Code was not directly copied; the implementation was written independently based on the paper, with this repository consulted for architectural reference.
+
+---
+
+## Use of Generative AI Tools
+
+**Tool used:** Claude
+
+Claude was used for:
+- **Writing this README** — structure, wording, and formatting.
+- **Boilerplate code in `src/run_lstm.py`** — config pretty-printing block and JSON serialisation of config/results to run directory.

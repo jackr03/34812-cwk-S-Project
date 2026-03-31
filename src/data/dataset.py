@@ -3,6 +3,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 
 
+# TODO: Remove the old one
 class NLIDataset(Dataset):
     """Pre-tokenizes premise–hypothesis pairs into tensors at init time."""
 

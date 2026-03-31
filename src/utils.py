@@ -1,22 +1,7 @@
-import json
 from pathlib import Path
 
-import optuna
 from matplotlib import pyplot as plt
 
-
-def run_sweep(objective, output_path: Path, n_trials: int) -> None:
-    print('Running hyperparameter sweep...')
-    study = optuna.create_study(direction='maximize', pruner=optuna.pruners.MedianPruner())
-    study.optimize(objective, n_trials=n_trials)
-
-    print('Hyperparameter sweep completed.')
-    print(f'Accuracy: {study.best_value * 100:.2f}%')
-    print(f'Parameters: {study.best_params}')
-
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_path, 'w') as f:
-        json.dump(study.best_params, f, indent=2)
 
 def plot_training_history(train_losses: list[float], train_accs: list[float], val_losses: list[float], val_accs: list[float], save_dir: Path) -> None:
     epochs = range(1, len(train_losses) + 1)
