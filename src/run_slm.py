@@ -127,14 +127,12 @@ def main():
 
     torch.manual_seed(CONFIG.seed)
 
+    # Load model and run baseline evaluation before fine-tuning
+
     print('Loading model...')
     model, tokeniser = load_base_model_and_tokenizer(cfg_slm, cfg_ft)
     tokeniser.model_max_length = cfg_slm.max_length
     print(f'  Model: {cfg_slm.model}')
-
-    # ------------------------------------------------------------------ #
-    # Baseline evaluation (zero-shot, no adapter)                         #
-    # ------------------------------------------------------------------ #
     print()
     print('=' * 60)
     print('Baseline Evaluation (zero-shot)')
@@ -142,9 +140,6 @@ def main():
     baseline_dev = evaluate_test(device, model, tokeniser, VAL_DATA_PATH, cfg_slm)
     print(f'Baseline dev — Acc: {baseline_dev["accuracy"] * 100:.2f}%  F1: {baseline_dev["f1_weighted"]:.4f}')
 
-    # ------------------------------------------------------------------ #
-    # Fine-tuning                                                         #
-    # ------------------------------------------------------------------ #
     train_pd = pd.read_csv(TRAIN_DATA_PATH)
     val_pd   = pd.read_csv(VAL_DATA_PATH)
 
@@ -152,9 +147,8 @@ def main():
     train_hf = Dataset.from_pandas(train_pd).map(fmt, batched=True)
     val_hf   = Dataset.from_pandas(val_pd).map(fmt, batched=True)
 
-    # ------------------------------------------------------------------ #
-    # Hyperparameter tuning                                               #
-    # ------------------------------------------------------------------ #
+
+    # Hyperparameter tuning with Optuna sweep
     if CONFIG.slm.hyperparameter_tuning.should_run:
         print()
         print('=' * 60)
@@ -290,9 +284,7 @@ def main():
     train_losses = [e['loss']      for e in trainer.state.log_history if 'loss'      in e and 'eval_loss' not in e]
     val_losses   = [e['eval_loss'] for e in trainer.state.log_history if 'eval_loss' in e]
 
-    # ------------------------------------------------------------------ #
-    # Post-training evaluation                                            #
-    # ------------------------------------------------------------------ #
+    # Evaluate fine-tuned model on dev set
     print()
     print('=' * 60)
     print('Post Fine-Tuning Evaluation')
