@@ -1,13 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-
-@dataclass(frozen=True)
-class TransformerHyperparameterTuningConfig:
-    epochs: int = 3
-    trials: int = 20
-    should_run: bool = False
-
 @dataclass(frozen=True)
 class SLMHyperparameterTuningConfig:
     epochs: int = 1
@@ -23,16 +16,11 @@ class LSTMHyperparameterTuningConfig:
 
 
 @dataclass(frozen=True)
-class TransformerConfig:
-    model: str = 'distilbert-base-uncased'
-    max_length: int = 64
-    hyperparameter_tuning: TransformerHyperparameterTuningConfig = TransformerHyperparameterTuningConfig()
-
-@dataclass(frozen=True)
 class SLMConfig:
     model: str = 'Qwen/Qwen3.5-9B-Base'
     max_length: int = 256
     hyperparameter_tuning: SLMHyperparameterTuningConfig = SLMHyperparameterTuningConfig()
+
 
 @dataclass(frozen=True)
 class SLMFinetuneConfig:
@@ -70,7 +58,6 @@ class Config:
     batch_size: int = 256
     epochs: int = 100
     patience: int = 15
-    transformer: TransformerConfig = TransformerConfig()
     lstm: LSTMConfig = LSTMConfig()
     slm: SLMConfig = SLMConfig()
     slm_finetune: SLMFinetuneConfig = SLMFinetuneConfig()
