@@ -118,5 +118,6 @@ Predictions will be saved to `output/`.
 
 Claude was used for:
 - **Writing this README** — structure, wording, and formatting.
+- **Writing the Model Card** - structure, wording, formatting, summarising and referencing logs and training/evaluation results.
 - **Boilerplate code in `src/run_slm.py`** — config pretty-printing block and JSON serialisation of config/results to run directory.
 - **Boilerplate code in job scripts** — config pretty-printing block and creating logs and results with date-appropriate naming to run directory.
