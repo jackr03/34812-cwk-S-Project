@@ -209,6 +209,17 @@ __marimo__/
 # Project
 checkpoints/
 runs/*/
+!runs/lstm/
+!runs/lstm/.gitkeep
+!runs/slm/
+!runs/slm/.gitkeep
+runs/slm/*/
+!runs/slm/demo/
+runs/slm/demo/*
+!runs/slm/demo/.gitkeep
+!runs/slm/eval/
+runs/slm/eval/*
+!runs/slm/eval/.gitkeep
 logs/*/
 
 # Other
