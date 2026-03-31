@@ -214,6 +214,9 @@ runs/*/
 !runs/slm/
 !runs/slm/.gitkeep
 runs/slm/*/
+!runs/slm/train/
+runs/slm/train/*
+!runs/slm/train/.gitkeep
 !runs/slm/demo/
 runs/slm/demo/*
 !runs/slm/demo/.gitkeep
