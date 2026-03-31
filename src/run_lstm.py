@@ -16,8 +16,7 @@ from src.models.lstm_classifier import LSTMClassifier
 from src.utils import plot_training_history
 
 TRAIN_DATA_PATH = Path('data/train.csv')
-VAL_DATA_PATH = Path('data/dev.csv')
-TEST_DATA_PATH = Path('data/NLI_trial.csv')
+DEV_DATA_PATH = Path('data/dev.csv')
 
 HYPERPARAMETERS_PATH = Path('hyperparameters/lstm.json')
 MODEL_PATH = Path('models/lstm.pt')
@@ -53,12 +52,10 @@ def main():
     lstm_tokeniser = LSTMTokeniser()
 
     train_dataset = LSTMDataset(TRAIN_DATA_PATH, lstm_tokeniser)
-    val_dataset = LSTMDataset(VAL_DATA_PATH, lstm_tokeniser)
-    test_dataset = LSTMDataset(TEST_DATA_PATH, lstm_tokeniser)
+    dev_dataset = LSTMDataset(DEV_DATA_PATH, lstm_tokeniser)
 
     train_dataloader = DataLoader(train_dataset, generator=generator, batch_size=CONFIG.batch_size, shuffle=True, drop_last=True, num_workers=4, pin_memory=True)
-    val_dataloader = DataLoader(val_dataset, generator=generator, batch_size=CONFIG.batch_size, shuffle=False, num_workers=4, pin_memory=True)
-    test_dataloader = DataLoader(test_dataset, generator=generator, batch_size=CONFIG.batch_size, shuffle=False, num_workers=4, pin_memory=True)
+    dev_dataloader = DataLoader(dev_dataset, generator=generator, batch_size=CONFIG.batch_size, shuffle=False, num_workers=4, pin_memory=True)
 
     if CONFIG.lstm.hyperparameter_tuning.should_run:
         run_hyperparameter_sweep(device, lstm_tokeniser, train_dataloader, val_dataloader, HYPERPARAMETERS_PATH)
@@ -90,9 +87,9 @@ def main():
         'seed': CONFIG.seed,
         'device': device_info,
         'train_samples': len(train_dataset),
-        'val_samples': len(val_dataset),
+        'val_samples': len(dev_dataset),
         'train_batches': len(train_dataloader),
-        'val_batches': len(val_dataloader),
+        'val_batches': len(dev_dataloader),
     }
 
     with open(run_dir / 'config.json', 'w') as f:
@@ -121,9 +118,9 @@ def main():
         print(f'  Compute cap:       {device_info["compute_capability"]}')
         print(f'  SMs:               {device_info["multi_processor_count"]}')
     print(f'  Train samples:     {len(train_dataset):,}')
-    print(f'  Val samples:       {len(val_dataset):,}')
+    print(f'  Val samples:       {len(dev_dataset):,}')
     print(f'  Train batches:     {len(train_dataloader):,}')
-    print(f'  Val batches:       {len(val_dataloader):,}')
+    print(f'  Val batches:       {len(dev_dataloader):,}')
     print('=' * 60)
     print()
 
@@ -141,7 +138,7 @@ def main():
         train_losses.append(train_loss)
         train_accs.append(train_acc)
 
-        val_loss, val_acc = validate(device, model, criterion, val_dataloader)
+        val_loss, val_acc = validate(device, model, criterion, dev_dataloader)
         val_losses.append(val_loss)
         val_accs.append(val_acc)
 
@@ -170,7 +167,7 @@ def main():
 
     print('Running final evaluation on benchmark...')
     model.load_state_dict(torch.load(MODEL_PATH), strict=False)
-    test_results = evaluate(device, model, test_dataloader)
+    test_results = evaluate(device, model, dev_dataloader)
     print('[Benchmark Results]')
     print(f'Accuracy:           {test_results["accuracy"] * 100:.2f}%')
     print(f'Macro Precision:    {test_results["macro_precision"]:.4f}')
