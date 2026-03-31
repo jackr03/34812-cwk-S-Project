@@ -11,7 +11,7 @@ def run_sweep(objective, output_path: Path, n_trials: int) -> None:
     study.optimize(objective, n_trials=n_trials)
 
     print('Hyperparameter sweep completed.')
-    print(f'Accuracy: {study.best_value * 100:.2f}%')
+    print(f'Best value: {study.best_value:.4f}')
     print(f'Parameters: {study.best_params}')
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
