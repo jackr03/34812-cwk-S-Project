@@ -169,7 +169,7 @@ def main():
     print(f'Best model had an accuracy of {best_acc:.2f}%.')
 
     print('Running final evaluation on benchmark...')
-    model.load_state_dict(torch.load(MODEL_PATH))
+    model.load_state_dict(torch.load(MODEL_PATH), strict=False)
     test_results = evaluate(device, model, test_dataloader)
     print('[Benchmark Results]')
     print(f'Accuracy:           {test_results["accuracy"] * 100:.2f}%')
