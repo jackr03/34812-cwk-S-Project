@@ -45,7 +45,7 @@ This model is `Qwen/Qwen3.5-9B-Base` (~9B parameters) fine-tuned for binary NLI 
 
 <!-- Provide links where applicable. -->
 
-- **Repository:** https://github.com/jackr03/34812-cwk-S-Project
+- **Repository:** https://huggingface.co/Qwen/Qwen3.5-9B-Base
 - **Paper or documentation:** https://arxiv.org/abs/2106.09685
 
 ## Training Details
