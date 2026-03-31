@@ -149,7 +149,7 @@ def main():
             best_acc = val_acc
             # Avoid saving GloVe embedding
             state = {k: v for k, v in model.state_dict().items() if 'embedding' not in k}
-            torch.save(model.state_dict(), MODEL_PATH)
+            torch.save(state, MODEL_PATH)
             patience = 0
         else:
             patience += 1
@@ -172,7 +172,7 @@ def main():
     model.load_state_dict(torch.load(MODEL_PATH))
     test_results = evaluate(device, model, test_dataloader)
     print('[Benchmark Results]')
-    print(f'Accuracy:           {test_results["accuracy"]:.2f}%')
+    print(f'Accuracy:           {test_results["accuracy"] * 100:.2f}%')
     print(f'Macro Precision:    {test_results["macro_precision"]:.4f}')
     print(f'Macro Recall:       {test_results["macro_recall"]:.4f}')
     print(f'Macro F1:           {test_results["macro_f1"]:.4f}')
