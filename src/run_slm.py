@@ -19,7 +19,7 @@ from transformers import TrainerCallback
 from trl import SFTConfig, SFTTrainer
 
 from src.config import CONFIG, SLMFinetuneConfig
-from src.models.nli_dataset import SLMNLIDatasetInference, format_slm_train_examples
+from src.slm_utils.slm_dataset import SLMNLIDatasetInference, format_slm_train_examples
 from src.models.slm_classifier import (
     get_lora_config,
     load_base_model_and_tokenizer,

@@ -71,8 +71,8 @@ class Config:
     epochs: int = 100
     patience: int = 15
     transformer: TransformerConfig = TransformerConfig()
+    lstm: LSTMConfig = LSTMConfig()
     slm: SLMConfig = SLMConfig()
     slm_finetune: SLMFinetuneConfig = SLMFinetuneConfig()
-    lstm: LSTMConfig = LSTMConfig()
 
 CONFIG = Config()

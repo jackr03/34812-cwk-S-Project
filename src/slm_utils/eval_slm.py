@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from src.config import CONFIG
-from src.models.nli_dataset import SLMNLIDatasetInference
+from src.slm_utils.slm_dataset import SLMNLIDatasetInference
 from src.models.slm_classifier import load_finetuned_for_inference, predict_batch
 
 DEFAULT_ADAPTER_PATH = Path('models/slm_adapter')
